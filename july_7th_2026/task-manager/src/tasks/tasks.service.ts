@@ -19,11 +19,11 @@ export class TasksService {
     },
   ];
 
-  getAllTasks() {
+  findAll() {
     return this.tasks;
   }
 
-  getTask(id: string) {
+  findOne(id: string) {
     const task = this.tasks.find((task) => task.id === Number(id));
 
     if (!task) {
@@ -33,7 +33,7 @@ export class TasksService {
     return task;
     }
 
-  createTask(createTaskDto: CreateTaskDto) {
+  create(createTaskDto: CreateTaskDto) {
     const newTask = {
       id: this.nextId++,
       title: createTaskDto.title,
@@ -44,8 +44,8 @@ export class TasksService {
     return newTask;
   }
 
-  updateTask(id: string, updateTaskDto: UpdateTaskDto) {
-    const task = this.getTask(id);
+  update(id: string, updateTaskDto: UpdateTaskDto) {
+    const task = this.findOne(id);
 
     if (updateTaskDto.title !== undefined) {
         task.title = updateTaskDto.title;
@@ -58,7 +58,7 @@ export class TasksService {
     return task;
     }
 
-    deleteTask(id: string) {
+    remove(id: string) {
     const index = this.tasks.findIndex(
         (task) => task.id === Number(id),
     );

@@ -1,0 +1,170 @@
+@host = http://localhost:3000
+
+###
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "ali_yukte",
+    "password": "secret123"
+}
+###
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "alice",
+    "password": "secret123"
+}
+
+###
+
+### Login (Expected: 200)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "alice",
+    "password": "secret123"
+}
+
+### Login with wrong password (Expected: 401)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "alice",
+    "password": "wrongpassword"
+}
+###
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoiYWxpY2UiLCJpYXQiOjE3ODM1MDE4NzYsImV4cCI6MTc4MzUwNTQ3Nn0.wkInFDs7uskHYy_8zxebH4h5F_q84tnsQz03nsd4gm8
+
+### Get all tasks (Expected: 401)
+GET {{host}}/tasks
+
+###
+
+### Get task by id (Expected: 401)
+GET {{host}}/tasks/1
+
+###
+
+### Create task (Expected: 401)
+POST {{host}}/tasks
+Content-Type: application/json
+
+{
+    "title": "Unauthorized Task"
+}
+
+###
+
+### Update task (Expected: 401)
+PATCH {{host}}/tasks/1
+Content-Type: application/json
+
+{
+    "completed": true
+}
+
+###
+
+### Delete task (Expected: 401)
+DELETE {{host}}/tasks/1
+
+### Get all tasks (Expected: 200)
+GET {{host}}/tasks
+Authorization: Bearer {{token}}
+
+###
+
+### Get task id=1 (Expected: 200)
+GET {{host}}/tasks/1
+Authorization: Bearer {{token}}
+
+###
+
+### Get non-existing task (Expected: 404)
+GET {{host}}/tasks/100
+Authorization: Bearer {{token}}
+
+###
+
+### Create task (Expected: 201)
+POST {{host}}/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Learn JWT Authentication"
+}
+
+###
+
+### Create another task
+POST {{host}}/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Complete Internship Task"
+}
+
+###
+
+### Update title
+PATCH {{host}}/tasks/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Learn Advanced NestJS"
+}
+
+###
+
+### Mark completed
+PATCH {{host}}/tasks/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "completed": true
+}
+
+### Update both fields
+PATCH {{host}}/tasks/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Updated Task",
+    "completed": true
+}
+
+###
+
+### Update non-existing task (Expected: 404)
+PATCH {{host}}/tasks/100
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Does not exist"
+}
+
+###
+
+### Delete task (Expected: 200)
+DELETE {{host}}/tasks/2
+Authorization: Bearer {{token}}
+
+###
+
+### Delete non-existing task (Expected: 404)
+DELETE {{host}}/tasks/100
+Authorization: Bearer {{token}}
+
+### Final task list
+GET {{host}}/tasks
+Authorization: Bearer {{token}}
