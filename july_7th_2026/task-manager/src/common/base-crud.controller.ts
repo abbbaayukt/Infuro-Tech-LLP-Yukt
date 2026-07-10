@@ -1,12 +1,4 @@
-import {
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Get, Post, Patch, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
 
 export abstract class BaseCrudController<TCreate, TUpdate> {
   constructor(protected readonly service: any) {}

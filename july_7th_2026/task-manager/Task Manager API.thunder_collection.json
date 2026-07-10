@@ -1,0 +1,273 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Task Manager API",
+  "dateExported": "2026-07-10T17:30:00.000Z",
+  "version": "2.1",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "1",
+      "colId": "",
+      "containerId": "",
+      "name": "Register - ali_yukte",
+      "url": "http://localhost:3000/auth/register",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\":\"ali_yukte\",\n  \"password\":\"secret123\"\n}"
+      }
+    },
+    {
+      "_id": "2",
+      "name": "Register - alice",
+      "url": "http://localhost:3000/auth/register",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\":\"alice\",\n  \"password\":\"secret123\"\n}"
+      }
+    },
+    {
+      "_id": "3",
+      "name": "Login",
+      "url": "http://localhost:3000/auth/login",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\":\"alice\",\n  \"password\":\"secret123\"\n}"
+      }
+    },
+    {
+      "_id": "4",
+      "name": "Login Wrong Password",
+      "url": "http://localhost:3000/auth/login",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\":\"alice\",\n  \"password\":\"wrongpassword\"\n}"
+      }
+    },
+    {
+      "_id": "5",
+      "name": "Get All Tasks (Unauthorized)",
+      "url": "http://localhost:3000/tasks",
+      "method": "GET"
+    },
+    {
+      "_id": "6",
+      "name": "Get Task By Id (Unauthorized)",
+      "url": "http://localhost:3000/tasks/1",
+      "method": "GET"
+    },
+    {
+      "_id": "7",
+      "name": "Create Task (Unauthorized)",
+      "url": "http://localhost:3000/tasks",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\":\"Unauthorized Task\"\n}"
+      }
+    },
+    {
+      "_id": "8",
+      "name": "Update Task (Unauthorized)",
+      "url": "http://localhost:3000/tasks/1",
+      "method": "PATCH",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"completed\":true\n}"
+      }
+    },
+    {
+      "_id": "9",
+      "name": "Delete Task (Unauthorized)",
+      "url": "http://localhost:3000/tasks/1",
+      "method": "DELETE"
+    },
+    {
+      "_id": "10",
+      "name": "Get All Tasks",
+      "url": "http://localhost:3000/tasks",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        }
+      ]
+    },
+    {
+      "_id": "11",
+      "name": "Get Task By Id",
+      "url": "http://localhost:3000/tasks/1",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        }
+      ]
+    },
+    {
+      "_id": "12",
+      "name": "Create Task",
+      "url": "http://localhost:3000/tasks",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\":\"Learn JWT Authentication\"\n}"
+      }
+    },
+    {
+      "_id": "13",
+      "name": "Create Another Task",
+      "url": "http://localhost:3000/tasks",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\":\"Complete Internship Task\"\n}"
+      }
+    },
+    {
+      "_id": "14",
+      "name": "Update Title",
+      "url": "http://localhost:3000/tasks/1",
+      "method": "PATCH",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\":\"Learn Advanced NestJS\"\n}"
+      }
+    },
+    {
+      "_id": "15",
+      "name": "Mark Completed",
+      "url": "http://localhost:3000/tasks/1",
+      "method": "PATCH",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"completed\":true\n}"
+      }
+    },
+    {
+      "_id": "16",
+      "name": "Update Both Fields",
+      "url": "http://localhost:3000/tasks/2",
+      "method": "PATCH",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\":\"Updated Task\",\n  \"completed\":true\n}"
+      }
+    },
+    {
+      "_id": "17",
+      "name": "Delete Task",
+      "url": "http://localhost:3000/tasks/2",
+      "method": "DELETE",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        }
+      ]
+    },
+    {
+      "_id": "18",
+      "name": "Final Task List",
+      "url": "http://localhost:3000/tasks",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        }
+      ]
+    }
+  ]
+}

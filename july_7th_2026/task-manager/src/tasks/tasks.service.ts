@@ -4,21 +4,37 @@ import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
+    private readonly usersService: UsersService,
   ) {}
 
-  async findAll() {
-    return await this.taskRepository.find();
-  }
+  async findAll(userId: number) {
+    return await this.taskRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        user: true,
+      },
+    });
+}
 
-  async findOne(id: number) {
+  async findOne(id: number, userId: number) {
     const task = await this.taskRepository.findOne({
-      where: { id },
+      where: { 
+        id,
+        user: {
+          id: userId,
+        }
+       },
     });
 
     if (!task) {
@@ -28,24 +44,31 @@ export class TasksService {
     return task;
   }
 
-  async createTask(createTaskDto: CreateTaskDto) {
+  async createTask(createTaskDto: CreateTaskDto, userId: number) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+    
     const task = this.taskRepository.create({
       title: createTaskDto.title,
+      user: user,
     });
 
     return await this.taskRepository.save(task);
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
-    const task = await this.findOne(id);
+  async update(id: number, userId: number, updateTaskDto: UpdateTaskDto) {
+    const task = await this.findOne(id, userId);
 
     Object.assign(task, updateTaskDto);
 
     return await this.taskRepository.save(task);
   }
 
-  async delete(id: number) {
-    const task = await this.findOne(id);
+  async delete(id: number, userId: number) {
+    const task = await this.findOne(id, userId);
 
     await this.taskRepository.remove(task);
 
