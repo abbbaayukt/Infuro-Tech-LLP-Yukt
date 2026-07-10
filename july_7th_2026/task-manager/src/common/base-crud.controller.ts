@@ -23,7 +23,7 @@ export abstract class BaseCrudController<TCreate, TUpdate> {
 
   @Post()
   create(@Body() dto: TCreate) {
-    return this.service.create(dto);
+    return this.service.createTask(dto);
   }
 
   @Patch(':id')
@@ -36,6 +36,6 @@ export abstract class BaseCrudController<TCreate, TUpdate> {
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+    return this.service.delete(id);
   }
 }
