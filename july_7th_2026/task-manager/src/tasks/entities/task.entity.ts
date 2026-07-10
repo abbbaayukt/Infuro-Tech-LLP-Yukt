@@ -4,17 +4,17 @@ import { User } from '../../users/entities/user-entity';
 @Entity('tasks')
 export class Task {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column()
-  title: string;
+  title!: string;
 
   @Column({ default: false })
-  completed: boolean;
+  completed?: boolean;
 
   @ManyToOne(
       () => User,
       (user) => user.tasks,
     )
-  user: User;
+  user?: User;
 }

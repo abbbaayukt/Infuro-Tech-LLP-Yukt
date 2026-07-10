@@ -4,16 +4,16 @@ import { Exclude } from 'class-transformer';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({
     unique: true,
   })
-  username: string;
+  username!: string;
   @Exclude()
   @Column()
-  password: string;
+  password!: string;
 
   @OneToMany(() => Task, (task) => task.user)
-  tasks: Task[];
+  tasks?: Task[];
 }
