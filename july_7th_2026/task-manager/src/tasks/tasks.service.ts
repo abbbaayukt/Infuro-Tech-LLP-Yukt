@@ -23,8 +23,8 @@ export class TasksService {
     return this.tasks;
   }
 
-  findOne(id: string) {
-    const task = this.tasks.find((task) => task.id === Number(id));
+  findOne(id: number) {
+    const task = this.tasks.find((task) => task.id === id);
 
     if (!task) {
         throw new NotFoundException(`Task with id ${id} not found`);
@@ -44,7 +44,7 @@ export class TasksService {
     return newTask;
   }
 
-  update(id: string, updateTaskDto: UpdateTaskDto) {
+  update(id: number, updateTaskDto: UpdateTaskDto) {
     const task = this.findOne(id);
 
     if (updateTaskDto.title !== undefined) {
@@ -58,9 +58,9 @@ export class TasksService {
     return task;
     }
 
-    remove(id: string) {
+    remove(id: number) {
     const index = this.tasks.findIndex(
-        (task) => task.id === Number(id),
+        (task) => task.id === id,
     );
 
     if (index === -1) {

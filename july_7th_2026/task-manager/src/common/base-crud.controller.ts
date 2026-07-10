@@ -5,6 +5,7 @@ import {
   Delete,
   Param,
   Body,
+  ParseIntPipe,
 } from '@nestjs/common';
 
 export abstract class BaseCrudController<TCreate, TUpdate> {
@@ -16,7 +17,7 @@ export abstract class BaseCrudController<TCreate, TUpdate> {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }
 
@@ -27,14 +28,14 @@ export abstract class BaseCrudController<TCreate, TUpdate> {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: TUpdate,
   ) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);
   }
 }
