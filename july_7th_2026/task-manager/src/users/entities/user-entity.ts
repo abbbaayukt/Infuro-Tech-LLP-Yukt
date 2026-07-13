@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Task } from '../../tasks/entities/task.entity';
 import { Exclude } from 'class-transformer';
+import { Role } from '../enums/role.enum';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -16,4 +18,11 @@ export class User {
 
   @OneToMany(() => Task, (task) => task.user)
   tasks?: Task[];
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role!: Role;
 }

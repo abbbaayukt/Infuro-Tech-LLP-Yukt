@@ -5,7 +5,7 @@ import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UsersService } from '../users/users.service';
-
+import { Role } from '../users/enums/role.enum';
 @Injectable()
 export class TasksService {
   constructor(
@@ -14,7 +14,15 @@ export class TasksService {
     private readonly usersService: UsersService,
   ) {}
 
-  async findAll(userId: number) {
+  async findAll(userId: number, role: Role) {
+
+    if (role === Role.ADMIN) {
+      return await this.taskRepository.find({
+        relations: {
+          user: true,
+        },
+      });
+    }
     return await this.taskRepository.find({
       where: {
         user: {
@@ -27,18 +35,38 @@ export class TasksService {
     });
 }
 
-  async findOne(id: number, userId: number) {
-    const task = await this.taskRepository.findOne({
-      where: { 
+  async findOne(
+    id: number,
+    userId: number,
+    role: Role,
+  ) {
+    let task: Task | null;
+
+    if (role === Role.ADMIN) {
+      task = await this.taskRepository.findOne({
+        where: { id },
+        relations: {
+          user: true,
+        },
+      });
+    } else {
+      task = await this.taskRepository.findOne({
+        where: {
         id,
         user: {
           id: userId,
-        }
-       },
-    });
+        },
+        },
+        relations: {
+          user: true,
+        },
+      });
+  }
 
     if (!task) {
-      throw new NotFoundException(`Task with id ${id} not found`);
+      throw new NotFoundException(
+        `Task with id ${id} not found`,
+      );
     }
 
     return task;
@@ -59,16 +87,33 @@ export class TasksService {
     return await this.taskRepository.save(task);
   }
 
-  async update(id: number, userId: number, updateTaskDto: UpdateTaskDto) {
-    const task = await this.findOne(id, userId);
+  async update(
+  id: number,
+  userId: number,
+  role: Role,
+  updateTaskDto: UpdateTaskDto,
+  ) {
+    const task = await this.findOne(
+      id,
+      userId,
+      role,
+    );
 
     Object.assign(task, updateTaskDto);
 
     return await this.taskRepository.save(task);
   }
 
-  async delete(id: number, userId: number) {
-    const task = await this.findOne(id, userId);
+  async delete(
+    id: number,
+    userId: number,
+    role: Role,
+  ) {
+    const task = await this.findOne(
+      id,
+      userId,
+      role,
+    );
 
     await this.taskRepository.remove(task);
 

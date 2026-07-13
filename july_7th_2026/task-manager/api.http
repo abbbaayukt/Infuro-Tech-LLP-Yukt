@@ -1,14 +1,10 @@
 @host = http://localhost:3000
 
-###
-POST {{host}}/auth/register
-Content-Type: application/json
+############################################################
+# AUTH
+############################################################
 
-{
-    "username": "ali_yukte",
-    "password": "secret123"
-}
-###
+### Register USER (Expected: 201)
 POST {{host}}/auth/register
 Content-Type: application/json
 
@@ -19,7 +15,29 @@ Content-Type: application/json
 
 ###
 
-### Login (Expected: 200)
+### Register another USER
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "bob",
+    "password": "secret123"
+}
+
+###
+
+### Duplicate username (Expected: 409)
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "alice",
+    "password": "secret123"
+}
+
+###
+
+### Login USER (Expected: 200)
 POST {{host}}/auth/login
 Content-Type: application/json
 
@@ -28,7 +46,9 @@ Content-Type: application/json
     "password": "secret123"
 }
 
-### Login with wrong password (Expected: 401)
+###
+
+### Wrong password (Expected: 401)
 POST {{host}}/auth/login
 Content-Type: application/json
 
@@ -36,135 +56,253 @@ Content-Type: application/json
     "username": "alice",
     "password": "wrongpassword"
 }
-###
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoiYWxpY2UiLCJpYXQiOjE3ODM1MDE4NzYsImV4cCI6MTc4MzUwNTQ3Nn0.wkInFDs7uskHYy_8zxebH4h5F_q84tnsQz03nsd4gm8
 
-### Get all tasks (Expected: 401)
+############################################################
+# TOKENS
+############################################################
+
+# USER Token
+@userToken = PASTE_USER_TOKEN_HERE
+
+# ADMIN Token
+@adminToken = PASTE_ADMIN_TOKEN_HERE
+
+############################################################
+# UNAUTHORIZED REQUESTS
+############################################################
+
+### Get Tasks (401)
 GET {{host}}/tasks
 
 ###
 
-### Get task by id (Expected: 401)
-GET {{host}}/tasks/1
-
-###
-
-### Create task (Expected: 401)
+### Create Task (401)
 POST {{host}}/tasks
 Content-Type: application/json
 
 {
-    "title": "Unauthorized Task"
+    "title":"Unauthorized"
 }
 
 ###
 
-### Update task (Expected: 401)
-PATCH {{host}}/tasks/1
-Content-Type: application/json
-
-{
-    "completed": true
-}
-
-###
-
-### Delete task (Expected: 401)
+### Delete Task (401)
 DELETE {{host}}/tasks/1
 
-### Get all tasks (Expected: 200)
-GET {{host}}/tasks
-Authorization: Bearer {{token}}
+############################################################
+# USER TASK APIs
+############################################################
+
+### Create Task 1
+POST {{host}}/tasks
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+    "title":"Learn NestJS"
+}
 
 ###
 
-### Get task id=1 (Expected: 200)
+### Create Task 2
+POST {{host}}/tasks
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+    "title":"Learn PostgreSQL"
+}
+
+###
+
+### Get All Tasks
+GET {{host}}/tasks
+Authorization: Bearer {{userToken}}
+
+###
+
+### Get Task
 GET {{host}}/tasks/1
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 ###
 
-### Get non-existing task (Expected: 404)
-GET {{host}}/tasks/100
-Authorization: Bearer {{token}}
+### Invalid Task
+GET {{host}}/tasks/999
+Authorization: Bearer {{userToken}}
 
 ###
 
-### Create task (Expected: 201)
-POST {{host}}/tasks
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-    "title": "Learn JWT Authentication"
-}
-
-###
-
-### Create another task
-POST {{host}}/tasks
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-    "title": "Complete Internship Task"
-}
-
-###
-
-### Update title
+### Update Title
 PATCH {{host}}/tasks/1
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 Content-Type: application/json
 
 {
-    "title": "Learn Advanced NestJS"
+    "title":"Master NestJS"
 }
 
 ###
 
-### Mark completed
+### Complete Task
 PATCH {{host}}/tasks/1
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 Content-Type: application/json
 
 {
-    "completed": true
+    "completed":true
 }
 
-### Update both fields
+###
+
+### Update Both
 PATCH {{host}}/tasks/2
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 Content-Type: application/json
 
 {
-    "title": "Updated Task",
-    "completed": true
+    "title":"Updated Task",
+    "completed":true
 }
 
-###
+############################################################
+# USER DELETE (Should Fail)
+############################################################
 
-### Update non-existing task (Expected: 404)
-PATCH {{host}}/tasks/100
-Authorization: Bearer {{token}}
-Content-Type: application/json
+### USER Delete Task (Expected: 403)
+DELETE {{host}}/tasks/1
+Authorization: Bearer {{userToken}}
 
-{
-    "title": "Does not exist"
-}
+############################################################
+# ADMIN TASK APIs
+############################################################
 
-###
-
-### Delete task (Expected: 200)
-DELETE {{host}}/tasks/2
-Authorization: Bearer {{token}}
-
-###
-
-### Delete non-existing task (Expected: 404)
-DELETE {{host}}/tasks/100
-Authorization: Bearer {{token}}
-
-### Final task list
+### ADMIN Get All Tasks
 GET {{host}}/tasks
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ADMIN Get Any Task
+GET {{host}}/tasks/1
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ADMIN Delete Task
+DELETE {{host}}/tasks/1
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ADMIN Delete Invalid Task
+DELETE {{host}}/tasks/999
+Authorization: Bearer {{adminToken}}
+
+############################################################
+# USERS (ADMIN ONLY)
+############################################################
+
+### Get All Users
+GET {{host}}/users
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Get User
+GET {{host}}/users/1
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Invalid User
+GET {{host}}/users/999
+Authorization: Bearer {{adminToken}}
+
+############################################################
+# CHANGE ROLE
+############################################################
+
+### Promote User to ADMIN
+PATCH {{host}}/users/2/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "role":"ADMIN"
+}
+
+###
+
+### Demote ADMIN to USER
+PATCH {{host}}/users/2/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "role":"USER"
+}
+
+############################################################
+# DELETE USERS
+############################################################
+
+### Delete USER
+DELETE {{host}}/users/2
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Delete Invalid User
+DELETE {{host}}/users/999
+Authorization: Bearer {{adminToken}}
+
+############################################################
+# RBAC TESTS
+############################################################
+
+### USER tries to list users (403)
+GET {{host}}/users
+Authorization: Bearer {{userToken}}
+
+###
+
+### USER tries to get user by id (403)
+GET {{host}}/users/1
+Authorization: Bearer {{userToken}}
+
+###
+
+### USER tries to change role (403)
+PATCH {{host}}/users/2/role
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+    "role":"ADMIN"
+}
+
+###
+
+### USER tries to delete user (403)
+DELETE {{host}}/users/2
+Authorization: Bearer {{userToken}}
+
+############################################################
+# LAST ADMIN SAFEGUARD
+############################################################
+
+### Demote Last Admin (Expected: 403)
+PATCH {{host}}/users/1/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "role":"USER"
+}
+
+###
+
+### Delete Last Admin (Expected: 403)
+DELETE {{host}}/users/1
+Authorization: Bearer {{adminToken}}

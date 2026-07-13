@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { UsersController } from './users/users.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +32,7 @@ import { ConfigService } from '@nestjs/config';
     UsersModule,
     AuthModule,
   ],
+  controllers: [UsersController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
