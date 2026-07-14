@@ -4,13 +4,15 @@ import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Role } from '../users/enums/role.enum';
+import { Role } from '../roles/entities/role.entity';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly rolesService: RolesService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -24,10 +26,16 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const userRole = await this.rolesService.findByName('USER');
+
+    if (!userRole) {
+      throw new Error('USER role not found');
+    }
+
     const user = await this.usersService.createUser(
       username,
       hashedPassword,
-      Role.USER,
+      userRole,
     );
 
     return {
@@ -57,7 +65,6 @@ export class AuthService {
     const payload = {
       sub: user.id,
       username: user.username,
-      role: user.role,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);

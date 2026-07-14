@@ -3,11 +3,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../users/enums/role.enum';
-
-@UseGuards(JwtAuthGuard, RolesGuard)
+import { Action } from '../permissions/enums/action.enum';
+import { Resource } from '../permissions/enums/resource.enum';
+import { Permission } from '../auth/decorators/permission.decorator';
+import { PermissionGuard } from '../permissions/guards/permission.guard';
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(
@@ -15,11 +15,19 @@ export class TasksController {
   ) {}
 
   @Get()
+  @Permission(
+    Resource.TASKS,
+    Action.READ,
+  )
   findAll(@Request() req) {
-    return this.tasksService.findAll(req.user.userId, req.user.role);
+    return this.tasksService.findAll(
+      req.user.userId,
+      req.user.scope,
+    );
   }
 
   @Get(':id')
+  @Permission(Resource.TASKS, Action.READ)
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @Request() req,
@@ -27,11 +35,12 @@ export class TasksController {
     return this.tasksService.findOne(
       id,
       req.user.userId,
-      req.user.role,
+      req.user.scope,
     );
   }
 
   @Post()
+  @Permission(Resource.TASKS, Action.CREATE)
   create(
     @Body() dto: CreateTaskDto,
     @Request() req,
@@ -43,6 +52,7 @@ export class TasksController {
   }
 
   @Patch(':id')
+  @Permission(Resource.TASKS, Action.UPDATE)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTaskDto,
@@ -51,11 +61,11 @@ export class TasksController {
     return this.tasksService.update(
       id,
       req.user.userId,
-      req.user.role,
+      req.user.scope,
       dto,
     );
   }
-  @Roles(Role.ADMIN)
+  @Permission(Resource.TASKS, Action.DELETE)
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
@@ -64,7 +74,7 @@ export class TasksController {
     return this.tasksService.delete(
       id,
       req.user.userId,
-      req.user.role,
+      req.user.scope,
     );
   }
 }

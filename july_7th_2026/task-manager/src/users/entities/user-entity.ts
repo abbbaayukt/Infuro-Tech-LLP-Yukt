@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { Task } from '../../tasks/entities/task.entity';
 import { Exclude } from 'class-transformer';
-import { Role } from '../enums/role.enum';
+import { Role } from '../../roles/entities/role.entity';
 
 @Entity('users')
 export class User {
@@ -19,10 +19,15 @@ export class User {
   @OneToMany(() => Task, (task) => task.user)
   tasks?: Task[];
 
-  @Column({
-    type: 'enum',
-    enum: Role,
-    default: Role.USER,
-  })
+  @ManyToOne(
+    () => Role,
+    (role) => role.users,
+  )
   role!: Role;
+
+  @Column({
+    type: 'jsonb',
+    default: {},
+  })
+  permissionOverride?: Record<string, any>;
 }

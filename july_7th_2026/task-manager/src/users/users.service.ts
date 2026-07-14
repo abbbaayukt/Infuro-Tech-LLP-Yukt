@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Role } from './enums/role.enum';
+import { Role } from '../roles/entities/role.entity';
 import { User } from './entities/user-entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly rolesService: RolesService,
   ) {}
 
   async findByUsername(username: string) {
@@ -21,9 +23,18 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id },
+      relations: {
+        role: true,
+      },
     });
+
+    if (!user){
+      throw new NotFoundException(`User with id ${id} not found`); 
+    }
+
+    return user;
   }
 
   async createUser(username: string, password: string, role: Role) {
@@ -43,6 +54,9 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
+      relations: {
+        role: true,
+      },
     });
 
     if (!user) {
@@ -55,7 +69,7 @@ export class UsersService {
   async delete(id: number) {
     const user = await this.findOne(id);
 
-    if (user.role === Role.ADMIN) {
+    if (user.role.name === "ADMIN") {
       const adminCount = await this.countAdmins();
 
       if (adminCount === 1) {
@@ -71,25 +85,32 @@ export class UsersService {
   }
 
   async changeRole(
-    id: number,
-    role: Role,
+    userId: number,
+    roleId: number,
   ) {
-    const user = await this.findOne(id);
-
-    if (
-      user.role === Role.ADMIN &&
-      role === Role.USER
-    ) {
-      const adminCount = await this.countAdmins();
-
-      if (adminCount === 1) {
-        throw new ForbiddenException(
-          'Cannot demote the last administrator',
-        );
-      }
+    const user = await this.findOne(userId);
+    const newrole = await this.rolesService.findById(roleId);
+    
+    if (!newrole) {
+      throw new NotFoundException(
+        `Role with id ${roleId} not found`,
+      );
     }
 
-    user.role = role;
+    if (
+      user.role.name === 'ADMIN' &&
+      newrole.name !== 'ADMIN'
+    ) {
+        const adminCount = await this.countAdmins();
+
+        if (adminCount === 1) {
+            throw new ForbiddenException(
+                'Cannot demote the last administrator',
+            );
+        }
+    }
+
+    user.role = newrole;
 
     return await this.userRepository.save(user);
   }
@@ -97,7 +118,7 @@ export class UsersService {
   async countAdmins() {
     return await this.userRepository.count({
       where: {
-        role: Role.ADMIN,
+        role: { name: "ADMIN" },
       },
     });
   }

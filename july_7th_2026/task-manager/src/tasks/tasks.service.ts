@@ -5,7 +5,8 @@ import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UsersService } from '../users/users.service';
-import { Role } from '../users/enums/role.enum';
+import { Scope } from './../permissions/enums/scope.enum';
+
 @Injectable()
 export class TasksService {
   constructor(
@@ -14,35 +15,39 @@ export class TasksService {
     private readonly usersService: UsersService,
   ) {}
 
-  async findAll(userId: number, role: Role) {
+  async findAll(
+      userId: number,
+      scope: Scope,
+  ) {
 
-    if (role === Role.ADMIN) {
-      return await this.taskRepository.find({
-        relations: {
-          user: true,
-        },
+      if (scope === Scope.ALL) {
+          return this.taskRepository.find({
+              relations:{
+                  user:true,
+              },
+          });
+      }
+
+      return this.taskRepository.find({
+          where:{
+              user:{
+                  id:userId,
+              },
+          },
+          relations:{
+              user:true,
+          },
       });
-    }
-    return await this.taskRepository.find({
-      where: {
-        user: {
-          id: userId,
-        },
-      },
-      relations: {
-        user: true,
-      },
-    });
-}
+  }
 
   async findOne(
     id: number,
     userId: number,
-    role: Role,
+    scope: Scope,
   ) {
     let task: Task | null;
 
-    if (role === Role.ADMIN) {
+    if (scope === Scope.ALL) {
       task = await this.taskRepository.findOne({
         where: { id },
         relations: {
@@ -52,16 +57,16 @@ export class TasksService {
     } else {
       task = await this.taskRepository.findOne({
         where: {
-        id,
-        user: {
-          id: userId,
-        },
+          id,
+          user: {
+            id: userId,
+          },
         },
         relations: {
           user: true,
         },
       });
-  }
+    }
 
     if (!task) {
       throw new NotFoundException(
@@ -88,15 +93,15 @@ export class TasksService {
   }
 
   async update(
-  id: number,
-  userId: number,
-  role: Role,
-  updateTaskDto: UpdateTaskDto,
+    id: number,
+    userId: number,
+    scope: Scope,
+    updateTaskDto: UpdateTaskDto,
   ) {
     const task = await this.findOne(
       id,
       userId,
-      role,
+      scope,
     );
 
     Object.assign(task, updateTaskDto);
@@ -107,12 +112,12 @@ export class TasksService {
   async delete(
     id: number,
     userId: number,
-    role: Role,
+    scope: Scope,
   ) {
     const task = await this.findOne(
       id,
       userId,
-      role,
+      scope,
     );
 
     await this.taskRepository.remove(task);

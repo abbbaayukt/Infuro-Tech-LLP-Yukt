@@ -1,7 +1,6 @@
-import { IsEnum } from 'class-validator';
-import { Role } from '../enums/role.enum';
+import { IsInt } from 'class-validator';
 
 export class ChangeRoleDto {
-  @IsEnum(Role)
-  role!: Role;
+  @IsInt()
+  roleId!: number;
 }
