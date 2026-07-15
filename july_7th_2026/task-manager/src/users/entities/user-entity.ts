@@ -5,8 +5,8 @@ import { Role } from '../../roles/entities/role.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id?: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column({
     unique: true,
@@ -17,7 +17,7 @@ export class User {
   password!: string;
 
   @OneToMany(() => Task, (task) => task.user)
-  tasks?: Task[];
+  tasks!: Task[];
 
   @ManyToOne(
     () => Role,

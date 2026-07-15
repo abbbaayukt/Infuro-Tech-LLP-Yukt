@@ -1,6 +1,6 @@
-import { IsInt } from 'class-validator';
+import { IsUUID } from 'class-validator';
 
 export class ChangeRoleDto {
-  @IsInt()
-  roleId!: number;
+  @IsUUID()
+  roleId!: string;
 }

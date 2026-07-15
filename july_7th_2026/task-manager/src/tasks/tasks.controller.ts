@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Patch, Delete, Param, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Patch, Delete, Param, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -29,7 +29,7 @@ export class TasksController {
   @Get(':id')
   @Permission(Resource.TASKS, Action.READ)
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Request() req,
   ) {
     return this.tasksService.findOne(
@@ -54,7 +54,7 @@ export class TasksController {
   @Patch(':id')
   @Permission(Resource.TASKS, Action.UPDATE)
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() dto: UpdateTaskDto,
     @Request() req,
   ) {
@@ -68,7 +68,7 @@ export class TasksController {
   @Permission(Resource.TASKS, Action.DELETE)
   @Delete(':id')
   remove(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Request() req,
   ) {
     return this.tasksService.delete(

@@ -16,7 +16,7 @@ export class RolesService {
     });
     }
 
-    async findById(id: number) {
+    async findById(id: string) {
     return await this.roleRepository.findOne({
         where: { id },
     });
@@ -32,7 +32,7 @@ export class RolesService {
     }
 
     async update(
-    id: number,
+    id: string,
     data: Partial<Role>,
     ) {
     const role = await this.findById(id);
@@ -46,7 +46,7 @@ export class RolesService {
     return await this.roleRepository.save(role);
     }
 
-    async delete(id: number) {
+    async delete(id: string) {
     const role = await this.findById(id);
 
     if (!role) {

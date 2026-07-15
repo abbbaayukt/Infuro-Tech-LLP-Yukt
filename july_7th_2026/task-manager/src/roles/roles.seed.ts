@@ -16,11 +16,8 @@ export class RolesSeed implements OnModuleInit {
         description: 'System Administrator',
         permissions: {
             '*': {
-            create: 'allow',
-            read: 'allow',
-            update: 'allow',
-            delete: 'allow',
-            scope: 'all',
+            "actions": ["create", "read", "update", "delete"],
+            "scope": "all",
             },
         },
         });
@@ -34,25 +31,16 @@ export class RolesSeed implements OnModuleInit {
         description: 'Regular User',
         permissions: {
             tasks: {
-            create: 'allow',
-            read: 'allow',
-            update: 'allow',
-            delete: 'deny',
-            scope: 'own',
+            "actions": ["create", "read", "update"],
+            "scope": "own",
             },
             users: {
-            create: 'deny',
-            read: 'deny',
-            update: 'deny',
-            delete: 'deny',
-            scope: 'own',
+            "actions": ["read"],
+            "scope": "own",
             },
             roles: {
-            create: 'deny',
-            read: 'deny',
-            update: 'deny',
-            delete: 'deny',
-            scope: 'own',
+            "actions": ["read"],
+            "scope": "own",
             },
         },
         });

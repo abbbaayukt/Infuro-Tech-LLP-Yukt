@@ -16,7 +16,7 @@ export class TasksService {
   ) {}
 
   async findAll(
-      userId: number,
+      userId: string,
       scope: Scope,
   ) {
 
@@ -41,8 +41,8 @@ export class TasksService {
   }
 
   async findOne(
-    id: number,
-    userId: number,
+    id: string,
+    userId: string,
     scope: Scope,
   ) {
     let task: Task | null;
@@ -77,7 +77,7 @@ export class TasksService {
     return task;
   }
 
-  async createTask(createTaskDto: CreateTaskDto, userId: number) {
+  async createTask(createTaskDto: CreateTaskDto, userId: string) {
     const user = await this.usersService.findById(userId);
 
     if (!user) {
@@ -93,8 +93,8 @@ export class TasksService {
   }
 
   async update(
-    id: number,
-    userId: number,
+    id: string,
+    userId: string,
     scope: Scope,
     updateTaskDto: UpdateTaskDto,
   ) {
@@ -110,8 +110,8 @@ export class TasksService {
   }
 
   async delete(
-    id: number,
-    userId: number,
+    id: string,
+    userId: string,
     scope: Scope,
   ) {
     const task = await this.findOne(

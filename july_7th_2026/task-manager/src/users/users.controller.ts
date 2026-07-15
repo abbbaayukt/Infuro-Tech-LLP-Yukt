@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Param, ParseIntPipe, UseGuards, Patch, Body, Res } from '@nestjs/common';
+import { Controller, Get, Delete, Param, UseGuards, Patch, Body, Res } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { ChangeRoleDto } from './dto/change-role.dto';
@@ -23,7 +23,7 @@ export class UsersController {
   @Get(':id')
   @Permission(Resource.USERS, Action.READ)
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.usersService.findOne(id);
   }
@@ -31,7 +31,7 @@ export class UsersController {
   @Delete(':id')
   @Permission(Resource.USERS, Action.DELETE)
   remove(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.usersService.delete(id);
   }
@@ -39,7 +39,7 @@ export class UsersController {
   @Patch(':id/role')
   @Permission(Resource.USERS, Action.UPDATE)
   changeRole(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() dto: ChangeRoleDto,
   ) {
     return this.usersService.changeRole(

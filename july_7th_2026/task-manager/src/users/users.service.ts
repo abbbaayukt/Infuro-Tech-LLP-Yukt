@@ -17,12 +17,13 @@ export class UsersService {
   async findByUsername(username: string) {
     return await this.userRepository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
       .addSelect('user.password')
       .where('user.username = :username', { username })
       .getOne();
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: {
@@ -51,7 +52,7 @@ export class UsersService {
   return await this.userRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: {
@@ -66,7 +67,7 @@ export class UsersService {
     return user;
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     const user = await this.findOne(id);
 
     if (user.role.name === "ADMIN") {
@@ -85,8 +86,8 @@ export class UsersService {
   }
 
   async changeRole(
-    userId: number,
-    roleId: number,
+    userId: string,
+    roleId: string,
   ) {
     const user = await this.findOne(userId);
     const newrole = await this.rolesService.findById(roleId);

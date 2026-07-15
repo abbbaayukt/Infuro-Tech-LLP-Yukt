@@ -3,8 +3,8 @@ import { ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user-entity';
 @Entity('tasks')
 export class Task {
-  @PrimaryGeneratedColumn()
-  id?: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column()
   title!: string;
@@ -16,5 +16,5 @@ export class Task {
       () => User,
       (user) => user.tasks,
     )
-  user?: User;
+  user!: User;
 }

@@ -1,4 +1,5 @@
 import { IsObject, IsOptional, IsString } from 'class-validator';
+import { PermissionDto } from './permission.dto';
 
 export class UpdateRoleDto {
 
@@ -12,5 +13,5 @@ export class UpdateRoleDto {
 
   @IsOptional()
   @IsObject()
-  permissions?: Record<string, any>;
+  permissions?: Record<string, PermissionDto>;
 }
