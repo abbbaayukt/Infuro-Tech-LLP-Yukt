@@ -7,8 +7,6 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import { CacheService } from './common/cache/cache.service';
 import { AppCacheModule } from './common/cache/cache.module';
 import { SupportModule } from './support/support.module';
 @Module({
