@@ -42,6 +42,13 @@ export class RolesSeed implements OnModuleInit {
             "actions": ["read"],
             "scope": "own",
             },
+            tickets: {
+            "scope": "own",
+            "actions": [
+                "create",
+                "read"
+            ]
+        }
         },
         });
     }

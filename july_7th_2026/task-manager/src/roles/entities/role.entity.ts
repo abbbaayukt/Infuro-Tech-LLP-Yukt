@@ -20,7 +20,7 @@ export class Role {
     type: 'jsonb',
     default: {},
   })
-  permissions?: Record<string, any>;
+  permissions!: Record<string, any>;
 
   @OneToMany(
     () => User,

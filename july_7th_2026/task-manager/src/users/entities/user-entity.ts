@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'ty
 import { Task } from '../../tasks/entities/task.entity';
 import { Exclude } from 'class-transformer';
 import { Role } from '../../roles/entities/role.entity';
-
+import { Ticket } from '../../support/entities/ticket.entity'
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -25,9 +25,9 @@ export class User {
   )
   role!: Role;
 
-  @Column({
-    type: 'jsonb',
-    default: {},
-  })
-  permissionOverride?: Record<string, any>;
+  @OneToMany(
+    () => Ticket,
+    (ticket) => ticket.user,
+  )
+  tickets!: Ticket[];
 }

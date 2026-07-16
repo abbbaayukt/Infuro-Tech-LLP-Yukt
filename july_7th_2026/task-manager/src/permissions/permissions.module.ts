@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
-import { User } from 'src/users/entities/user-entity';
 import { PermissionGuard } from './guards/permission.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Role } from '../roles/entities/role.entity';
+import { AppCacheModule } from '../common/cache/cache.module';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Role]),
+    AppCacheModule,
   ],
   providers: [
     PermissionsService,

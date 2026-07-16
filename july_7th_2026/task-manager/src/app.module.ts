@@ -1,6 +1,4 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TasksModule } from './tasks/tasks.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -8,9 +6,11 @@ import { ConfigModule } from '@nestjs/config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { UsersController } from './users/users.controller';
 import { RolesModule } from './roles/roles.module';
-import { PermissionsModule } from './permissions/permissions.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { CacheService } from './common/cache/cache.service';
+import { AppCacheModule } from './common/cache/cache.module';
+import { SupportModule } from './support/support.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,8 +34,11 @@ import { PermissionsModule } from './permissions/permissions.module';
     UsersModule,
     AuthModule,
     RolesModule,
+    AppCacheModule,
+    SupportModule,
   ],
   controllers: [],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

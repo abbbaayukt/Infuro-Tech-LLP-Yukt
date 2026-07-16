@@ -4,7 +4,6 @@ import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Role } from '../roles/entities/role.entity';
 import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
@@ -67,7 +66,6 @@ export class AuthService {
       username: user.username,
       roleId: user.role.id,
       roleName: user.role.name,
-      permissions: user.role.permissions,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);

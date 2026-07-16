@@ -5,7 +5,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Action } from '../permissions/enums/action.enum';
 import { Resource } from '../permissions/enums/resource.enum';
-import { Permission } from '../auth/decorators/permission.decorator';
+import { Permission } from '../permissions/decorators/permission.decorator';
 import { PermissionGuard } from '../permissions/guards/permission.guard';
 @UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller('tasks')
@@ -15,10 +15,10 @@ export class TasksController {
   ) {}
 
   @Get()
-  @Permission(
-    Resource.TASKS,
-    Action.READ,
-  )
+  @Permission({
+    resource: Resource.TASKS,
+    action: Action.READ,
+  })
   findAll(@Request() req) {
     return this.tasksService.findAll(
       req.user.userId,
@@ -27,7 +27,10 @@ export class TasksController {
   }
 
   @Get(':id')
-  @Permission(Resource.TASKS, Action.READ)
+  @Permission({
+    resource: Resource.TASKS,
+    action: Action.READ,
+  })
   findOne(
     @Param('id') id: string,
     @Request() req,
@@ -40,7 +43,10 @@ export class TasksController {
   }
 
   @Post()
-  @Permission(Resource.TASKS, Action.CREATE)
+  @Permission({
+    resource: Resource.TASKS,
+    action: Action.CREATE,
+  })
   create(
     @Body() dto: CreateTaskDto,
     @Request() req,
@@ -52,7 +58,10 @@ export class TasksController {
   }
 
   @Patch(':id')
-  @Permission(Resource.TASKS, Action.UPDATE)
+  @Permission({
+    resource: Resource.TASKS,
+    action: Action.UPDATE,
+  })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateTaskDto,
@@ -65,7 +74,10 @@ export class TasksController {
       dto,
     );
   }
-  @Permission(Resource.TASKS, Action.DELETE)
+  @Permission({
+    resource: Resource.TASKS,
+    action: Action.DELETE,
+  })
   @Delete(':id')
   remove(
     @Param('id') id: string,

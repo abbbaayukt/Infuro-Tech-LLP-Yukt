@@ -5,7 +5,7 @@ import { ChangeRoleDto } from './dto/change-role.dto';
 import { PermissionGuard } from '../permissions/guards/permission.guard';
 import { Action } from '../permissions/enums/action.enum';
 import { Resource } from '../permissions/enums/resource.enum';
-import { Permission } from '../auth/decorators/permission.decorator';
+import { Permission } from '../permissions/decorators/permission.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -15,13 +15,13 @@ export class UsersController {
   ) {}
 
   @Get()
-  @Permission(Resource.USERS, Action.READ)
+  @Permission({ resource: Resource.USERS, action: Action.READ })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  @Permission(Resource.USERS, Action.READ)
+  @Permission({ resource: Resource.USERS, action: Action.READ })
   findOne(
     @Param('id') id: string,
   ) {
@@ -29,7 +29,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Permission(Resource.USERS, Action.DELETE)
+  @Permission({ resource: Resource.USERS, action: Action.DELETE })
   remove(
     @Param('id') id: string,
   ) {
@@ -37,7 +37,7 @@ export class UsersController {
   }
 
   @Patch(':id/role')
-  @Permission(Resource.USERS, Action.UPDATE)
+  @Permission({ resource: Resource.USERS, action: Action.UPDATE })
   changeRole(
     @Param('id') id: string,
     @Body() dto: ChangeRoleDto,

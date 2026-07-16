@@ -4,7 +4,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionGuard } from '../permissions/guards/permission.guard';
-import { Permission } from '../auth/decorators/permission.decorator';
+import { Permission } from '../permissions/decorators/permission.decorator';
 import { Resource } from '../permissions/enums/resource.enum';
 import { Action } from '../permissions/enums/action.enum';
 
@@ -16,13 +16,13 @@ export class RolesController {
   ) {}
 
   @Get()
-  @Permission(Resource.ROLES, Action.READ)
+  @Permission({ resource: Resource.ROLES, action: Action.READ })
   findAll() {
     return this.rolesService.findAll();
   }
 
   @Get(':id')
-  @Permission(Resource.ROLES, Action.READ)
+  @Permission({ resource: Resource.ROLES, action: Action.READ })
   findOne(
     @Param('id') id: string,
   ) {
@@ -30,7 +30,7 @@ export class RolesController {
   }
 
   @Post()
-  @Permission(Resource.ROLES, Action.CREATE)
+  @Permission({ resource: Resource.ROLES, action: Action.CREATE })
   create(
     @Body() dto: CreateRoleDto,
   ) {
@@ -38,7 +38,7 @@ export class RolesController {
   }
 
   @Patch(':id')
-  @Permission(Resource.ROLES, Action.UPDATE)
+  @Permission({ resource: Resource.ROLES, action: Action.UPDATE })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateRoleDto,
@@ -50,7 +50,7 @@ export class RolesController {
   }
 
   @Delete(':id')
-  @Permission(Resource.ROLES, Action.DELETE)
+  @Permission({ resource: Resource.ROLES, action: Action.DELETE })
   remove(
     @Param('id') id: string,
   ) {

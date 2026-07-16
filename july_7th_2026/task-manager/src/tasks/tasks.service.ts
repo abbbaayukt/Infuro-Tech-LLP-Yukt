@@ -78,16 +78,13 @@ export class TasksService {
   }
 
   async createTask(createTaskDto: CreateTaskDto, userId: string) {
-    const user = await this.usersService.findById(userId);
-
-    if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found`);
-    }
-    
+  
     const task = this.taskRepository.create({
-      title: createTaskDto.title,
-      user: user,
-    });
+    title: createTaskDto.title,
+    user: {
+      id: userId,
+    },
+  });
 
     return await this.taskRepository.save(task);
   }

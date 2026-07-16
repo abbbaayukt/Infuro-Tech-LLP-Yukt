@@ -1,47 +1,44 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PERMISSION_KEY } from '../../auth/decorators/permission.decorator';
+import { PermissionsService } from '../permissions.service';
+import { PERMISSION_KEY } from '../../permissions/decorators/permission.decorator';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
+    private readonly permissionsService: PermissionsService,
   ) {}
 
-  canActivate(
+  async canActivate(
     context: ExecutionContext,
-  ): boolean {
-
-    const permission = this.reflector.get(
+  ): Promise<boolean> {
+    const permissions = this.reflector.get(
       PERMISSION_KEY,
       context.getHandler(),
     );
 
-    if (!permission) {
+    if (!permissions || permissions.length === 0) {
       return true;
     }
 
     const request = context.switchToHttp().getRequest();
-
     const user = request.user;
 
-    const permissionData =
-      user.permissions?.[permission.resource] ??
-      user.permissions?.['*'];
+    for (const permission of permissions) {
+      const result =
+        await this.permissionsService.validatePermission(
+          user.roleId,
+          permission.resource,
+          permission.action,
+        );
 
-    if (!permissionData) {
-      throw new ForbiddenException('Permission denied');
+      if (result.allowed) {
+        request.user.scope = result.scope;
+        return true;
+      }
     }
 
-    const hasPermission =
-      permissionData.actions.includes(permission.action);
-
-    if (!hasPermission) {
-      throw new ForbiddenException('Permission denied');
-    }
-
-    request.user.scope = permissionData.scope;
-
-    return true;
+    throw new ForbiddenException('Permission denied');
   }
 }
