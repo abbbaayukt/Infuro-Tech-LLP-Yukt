@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
 import { AppCacheModule } from './common/cache/cache.module';
 import { SupportModule } from './support/support.module';
+import { TenantsModule } from './tenants/tenants.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,6 +35,7 @@ import { SupportModule } from './support/support.module';
     RolesModule,
     AppCacheModule,
     SupportModule,
+    TenantsModule,
   ],
   controllers: [],
   providers: [],
