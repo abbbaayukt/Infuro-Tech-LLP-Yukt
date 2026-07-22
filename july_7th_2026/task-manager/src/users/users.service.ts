@@ -1,30 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';
 import { User } from './entities/user-entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { RolesService } from 'src/roles/roles.service';
+import { TenantDatabaseService } from '../common/database/tenant-database.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly tenantDatabase: TenantDatabaseService,
     private readonly rolesService: RolesService,
   ) {}
 
-  async findByUsername(username: string) {
-    return await this.userRepository
+  async findByUsername(username: string, tenantId: string) {
+    const userRepository = this.tenantDatabase.getRepository(User);
+    return await userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .addSelect('user.password')
       .where('user.username = :username', { username })
+      .andWhere('user.tenantId = :tenantId', {
+        tenantId,
+      })
       .getOne();
   }
 
   async findById(id: string) {
-    const user = await this.userRepository.findOne({
+    const userRepository = this.tenantDatabase.getRepository(User);
+    const user = await userRepository.findOne({
       where: { id },
     });
 
@@ -38,21 +41,24 @@ export class UsersService {
   }
 
   async createUser(username: string, password: string, role: Role) {
-    const user = this.userRepository.create({
+    const userRepository = this.tenantDatabase.getRepository(User);
+    const user = userRepository.create({
       username,
       password,
       role,
     });
 
-    return await this.userRepository.save(user);
+    return await userRepository.save(user);
   }
 
   async findAll() {
-  return await this.userRepository.find();
+    const userRepository = this.tenantDatabase.getRepository(User);
+    return await userRepository.find();
   }
 
   async findOne(id: string) {
-    const user = await this.userRepository.findOne({
+    const userRepository = this.tenantDatabase.getRepository(User);
+    const user = await userRepository.findOne({
       where: { id },
       relations: {
         role: true,
@@ -67,6 +73,7 @@ export class UsersService {
   }
 
   async delete(id: string) {
+    const userRepository = this.tenantDatabase.getRepository(User);
     const user = await this.findOne(id);
 
     if (user.role.name === "ADMIN") {
@@ -79,7 +86,7 @@ export class UsersService {
       }
     }
 
-    await this.userRepository.remove(user);
+    await userRepository.remove(user);
 
     return user;
   }
@@ -90,7 +97,7 @@ export class UsersService {
   ) {
     const user = await this.findOne(userId);
     const newrole = await this.rolesService.findById(roleId);
-    
+    const userRepository = this.tenantDatabase.getRepository(User);
     if (!newrole) {
       throw new NotFoundException(
         `Role with id ${roleId} not found`,
@@ -112,11 +119,12 @@ export class UsersService {
 
     user.role = newrole;
 
-    return await this.userRepository.save(user);
+    return await userRepository.save(user);
   }
 
   async countAdmins() {
-    return await this.userRepository.count({
+    const userRepository = this.tenantDatabase.getRepository(User);
+    return await userRepository.count({
       where: {
         role: { name: "ADMIN" },
       },

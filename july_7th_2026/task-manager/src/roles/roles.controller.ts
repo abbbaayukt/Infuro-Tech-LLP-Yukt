@@ -8,7 +8,7 @@ import { Permission } from '../permissions/decorators/permission.decorator';
 import { Resource } from '../permissions/enums/resource.enum';
 import { Action } from '../permissions/enums/action.enum';
 
-@UseGuards(JwtAuthGuard, PermissionGuard)
+@UseGuards(JwtAuthGuard,PermissionGuard)
 @Controller('roles')
 export class RolesController {
   constructor(

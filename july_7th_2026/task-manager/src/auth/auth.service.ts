@@ -4,11 +4,14 @@ import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { RolesService } from 'src/roles/roles.service';
-
+import { RolesService } from '../roles/roles.service';
+import { TenantContext } from '../common/context/tenant.context';
+import { TenantsService } from '../tenants/tenants.service';
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly tenantsService: TenantsService,
+    private readonly tenantContext: TenantContext,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly rolesService: RolesService,
@@ -17,7 +20,21 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const { username, password } = registerDto;
 
-    const existingUser = await this.usersService.findByUsername(username);
+    const tenant = await this.tenantsService.findByName( registerDto.tenant );
+
+  if (!tenant) {
+      throw new UnauthorizedException(
+          'Invalid tenant',
+      );
+  }
+
+  this.tenantContext.setSchema(
+      tenant.schemaName,
+  );
+
+  const existingUser =
+      await this.usersService.findByUsername(
+          registerDto.username, registerDto.tenant)
 
     if (existingUser) {
       throw new ConflictException('Username already exists');
@@ -44,11 +61,16 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const { username, password } = loginDto;
+    const { tenant, username, password } = loginDto;
 
-    const user = await this.usersService.findByUsername(username);
+    const Tenant = await this.tenantsService.findByName(tenant);
 
-    if (!user) {
+    if (!Tenant) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const user = await this.usersService.findByUsername( username, Tenant.id );
+    if (!user){
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -63,6 +85,7 @@ export class AuthService {
 
     const payload = {
       sub: user.id,
+      tenantId: user.tenantId,
       username: user.username,
       roleId: user.role.id,
       roleName: user.role.name,
