@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-import { User } from '../../users/entities/user-entity';
+import { User } from '../../users/entities/user.entity';
 @Entity({
-  schema: 'support',
   name: 'tickets',
 })
 export class Ticket {

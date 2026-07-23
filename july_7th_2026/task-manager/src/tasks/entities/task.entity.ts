@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { ManyToOne } from 'typeorm';
-import { User } from '../../users/entities/user-entity';
+import { User } from '../../users/entities/user.entity';
 @Entity('tasks')
 export class Task {
   @PrimaryGeneratedColumn('uuid')

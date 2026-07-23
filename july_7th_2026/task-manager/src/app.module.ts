@@ -10,6 +10,8 @@ import { RolesModule } from './roles/roles.module';
 import { AppCacheModule } from './common/cache/cache.module';
 import { SupportModule } from './support/support.module';
 import { TenantsModule } from './tenants/tenants.module';
+import { ContextModule } from './common/context/context.module';
+import { DatabaseModule } from './common/database/database.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +38,8 @@ import { TenantsModule } from './tenants/tenants.module';
     AppCacheModule,
     SupportModule,
     TenantsModule,
+    ContextModule,
+    DatabaseModule,
   ],
   controllers: [],
   providers: [],

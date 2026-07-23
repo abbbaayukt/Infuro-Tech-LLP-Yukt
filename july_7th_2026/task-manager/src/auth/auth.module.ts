@@ -9,13 +9,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SignOptions } from 'jsonwebtoken';
 import { RolesModule } from 'src/roles/roles.module';
 import { PermissionsModule } from 'src/permissions/permissions.module';
+import { TenantsModule } from 'src/tenants/tenants.module';
+import { ContextModule } from 'src/common/context/context.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    TenantsModule,
     PermissionsModule,
     RolesModule,
+    ContextModule,
     JwtModule.registerAsync({
     imports: [ConfigModule],
     inject: [ConfigService],

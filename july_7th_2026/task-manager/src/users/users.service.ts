@@ -1,27 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { Role } from '../roles/entities/role.entity';
-import { User } from './entities/user-entity';
+import { User } from './entities/user.entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { RolesService } from 'src/roles/roles.service';
 import { TenantDatabaseService } from '../common/database/tenant-database.service';
+import { MasterUsersService } from '../master-users/master-users.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly tenantDatabase: TenantDatabaseService,
     private readonly rolesService: RolesService,
+    private readonly masterUsersService: MasterUsersService,
   ) {}
 
-  async findByUsername(username: string, tenantId: string) {
+  async findByUsername(username: string) {
     const userRepository = this.tenantDatabase.getRepository(User);
     return await userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .addSelect('user.password')
       .where('user.username = :username', { username })
-      .andWhere('user.tenantId = :tenantId', {
-        tenantId,
-      })
       .getOne();
   }
 
@@ -40,16 +39,22 @@ export class UsersService {
     return user;
   }
 
-  async createUser(username: string, password: string, role: Role) {
-    const userRepository = this.tenantDatabase.getRepository(User);
-    const user = userRepository.create({
-      username,
-      password,
-      role,
-    });
+  async createUser(
+    username: string,
+    password: string,
+    role: Role,
+    ) {
+        const repo =
+            this.tenantDatabase.getRepository(User);
 
-    return await userRepository.save(user);
-  }
+        const user = repo.create({
+            username,
+            password,
+            role,
+        });
+
+        return repo.save(user);
+    }
 
   async findAll() {
     const userRepository = this.tenantDatabase.getRepository(User);
@@ -87,7 +92,7 @@ export class UsersService {
     }
 
     await userRepository.remove(user);
-
+    await this.masterUsersService.deactivate(user.id);
     return user;
   }
 
@@ -118,7 +123,7 @@ export class UsersService {
     }
 
     user.role = newrole;
-
+    await this.masterUsersService.updateRole(user.id, newrole.name);
     return await userRepository.save(user);
   }
 
@@ -129,5 +134,38 @@ export class UsersService {
         role: { name: "ADMIN" },
       },
     });
+  }
+
+  async resetFailedAttempts(userId: string) {
+    const userRepository =
+      this.tenantDatabase.getRepository(User);
+
+    await userRepository.update(userId, {
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+    });
+  }
+
+  async incrementFailedAttempts(
+      user: User,
+      maxAttempts: number,
+      lockMinutes: number,
+  ) {
+      const userRepository =
+          this.tenantDatabase.getRepository(User);
+
+      user.failedLoginAttempts++;
+
+      if (
+          user.failedLoginAttempts >=
+          maxAttempts
+      ) {
+          user.lockedUntil = new Date(
+              Date.now() +
+              lockMinutes * 60 * 1000,
+          );
+      }
+
+      await userRepository.save(user);
   }
 }

@@ -30,4 +30,13 @@ export class User {
     (ticket) => ticket.user,
   )
   tickets!: Ticket[];
+
+  @Column({ default: 0 })
+  failedLoginAttempts!: number;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  lockedUntil!: Date | null;
 }

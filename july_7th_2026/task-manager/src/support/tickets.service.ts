@@ -1,30 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Ticket } from './entities/ticket.entity';
 import { Scope } from '../permissions/enums/scope.enum';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { TenantDatabaseService } from '../common/database/tenant-database.service';
 @Injectable()
 export class TicketsService {
   constructor(
-    @InjectRepository(Ticket)
-    private readonly ticketRepository: Repository<Ticket>,
+    private readonly tenantDatabase : TenantDatabaseService
   ) {}
   async findAll(
         userId: string,
         scope: Scope,
     ) {
-  
+      const ticketRepository = this.tenantDatabase.getRepository(Ticket); 
         if (scope === Scope.ALL) {
-            return this.ticketRepository.find({
+            return ticketRepository.find({
                 relations:{
                     user:true,
                 },
             });
         }
   
-        return this.ticketRepository.find({
+        return ticketRepository.find({
             where:{
                 user:{
                     id:userId,
@@ -42,16 +40,17 @@ export class TicketsService {
       scope: Scope,
     ) {
       let ticket: Ticket | null;
-  
+
+      const ticketRepository = this.tenantDatabase.getRepository(Ticket);
       if (scope === Scope.ALL) {
-        ticket = await this.ticketRepository.findOne({
+        ticket = await ticketRepository.findOne({
           where: { id },
           relations: {
             user: true,
           },
         });
       } else {
-        ticket = await this.ticketRepository.findOne({
+        ticket = await ticketRepository.findOne({
           where: {
             id,
             user: {
@@ -74,15 +73,15 @@ export class TicketsService {
     }
   
     async create(createTicketDto: CreateTicketDto, userId: string) {
-    
-      const ticket = this.ticketRepository.create({
+      const ticketRepository = this.tenantDatabase.getRepository(Ticket);
+      const ticket = ticketRepository.create({
       title: createTicketDto.title,
       user: {
         id: userId,
       },
     });
   
-      return await this.ticketRepository.save(ticket);
+      return await ticketRepository.save(ticket);
     }
   
     async update(
@@ -96,10 +95,10 @@ export class TicketsService {
         userId,
         scope,
       );
-  
+      const ticketRepository = this.tenantDatabase.getRepository(Ticket);
       Object.assign(ticket, updateTicketDto);
   
-      return await this.ticketRepository.save(ticket);
+      return await ticketRepository.save(ticket);
     }
   
     async delete(
@@ -112,8 +111,8 @@ export class TicketsService {
         userId,
         scope,
       );
-  
-      await this.ticketRepository.remove(ticket);
+      const ticketRepository = this.tenantDatabase.getRepository(Ticket);
+      await ticketRepository.remove(ticket);
   
       return ticket;
     }

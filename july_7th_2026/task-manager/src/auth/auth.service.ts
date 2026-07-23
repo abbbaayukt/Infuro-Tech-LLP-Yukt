@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login.dto';
 import { RolesService } from '../roles/roles.service';
 import { TenantContext } from '../common/context/tenant.context';
 import { TenantsService } from '../tenants/tenants.service';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly rolesService: RolesService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -34,7 +36,7 @@ export class AuthService {
 
   const existingUser =
       await this.usersService.findByUsername(
-          registerDto.username, registerDto.tenant)
+          registerDto.username )
 
     if (existingUser) {
       throw new ConflictException('Username already exists');
@@ -69,9 +71,28 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const user = await this.usersService.findByUsername( username, Tenant.id );
+    const user = await this.usersService.findByUsername( username );
     if (!user){
       throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    const maxAttempts =
+        this.configService.get<number>(
+            'MAX_LOGIN_ATTEMPTS',
+        )!;
+
+    const lockMinutes =
+        this.configService.get<number>(
+            'ACCOUNT_LOCK_DURATION_MINUTES',
+        )!;
+
+    if (
+      user.lockedUntil &&
+      user.lockedUntil > new Date()
+    ) {
+      throw new ForbiddenException(
+          `Account locked. Try again after ${lockMinutes} minutes.`,
+      );
     }
 
     const isMatch = await bcrypt.compare(
@@ -80,12 +101,20 @@ export class AuthService {
     );
 
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      await this.usersService.incrementFailedAttempts( user, maxAttempts, lockMinutes );
+
+      throw new UnauthorizedException(
+          'Invalid credentials',
+      );
     }
+
+    await this.usersService.resetFailedAttempts(
+      user.id,
+    );
 
     const payload = {
       sub: user.id,
-      tenantId: user.tenantId,
+      tenantId: Tenant.id,
       username: user.username,
       roleId: user.role.id,
       roleName: user.role.name,

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, EntityTarget, Repository } from 'typeorm';
+import { DataSource, EntityTarget, Repository, ObjectLiteral } from 'typeorm';
 import { TenantContext } from '../context/tenant.context';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class TenantDatabaseService {
     private readonly tenantContext: TenantContext,
   ) {}
 
-  getRepository<T>(
+  getRepository<T extends ObjectLiteral>(
     entity: EntityTarget<T>,
   ): Repository<T> {
 

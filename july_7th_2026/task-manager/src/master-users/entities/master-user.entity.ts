@@ -2,21 +2,31 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 
 @Entity({
   schema: 'public',
-  name: 'tenants',
+  name: 'master_users',
 })
-export class Tenant {
+export class MasterUser {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({
-    unique: true,
-  })
-  name!: string;
+  @Column()
+  userId!: string;
+  
+  @Column()
+  tenantId!: string;
+
+  @Column()
+  tenantName!: string;
+
+  @Column()
+  username!: string;
+
+  @Column()
+  roleName!: string;
 
   @Column({
-    unique: true,
+    default: true,
   })
-  schemaName!: string;
+  isActive!: boolean;
 
   @CreateDateColumn()
   createdAt!: Date;

@@ -1,17 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UsersService } from '../users/users.service';
 import { Scope } from './../permissions/enums/scope.enum';
+import { TenantDatabaseService } from '../common/database/tenant-database.service';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectRepository(Task)
-    private readonly taskRepository: Repository<Task>,
+    private readonly tenantDatabase: TenantDatabaseService,
     private readonly usersService: UsersService,
   ) {}
 
@@ -19,16 +17,16 @@ export class TasksService {
       userId: string,
       scope: Scope,
   ) {
-
+    const taskRepository = this.tenantDatabase.getRepository(Task);
       if (scope === Scope.ALL) {
-          return this.taskRepository.find({
+          return taskRepository.find({
               relations:{
                   user:true,
               },
           });
       }
 
-      return this.taskRepository.find({
+      return taskRepository.find({
           where:{
               user:{
                   id:userId,
@@ -47,15 +45,16 @@ export class TasksService {
   ) {
     let task: Task | null;
 
+    const taskRepository = this.tenantDatabase.getRepository(Task); 
     if (scope === Scope.ALL) {
-      task = await this.taskRepository.findOne({
+      task = await taskRepository.findOne({
         where: { id },
         relations: {
           user: true,
         },
       });
     } else {
-      task = await this.taskRepository.findOne({
+      task = await taskRepository.findOne({
         where: {
           id,
           user: {
@@ -78,15 +77,15 @@ export class TasksService {
   }
 
   async createTask(createTaskDto: CreateTaskDto, userId: string) {
-  
-    const task = this.taskRepository.create({
+    const taskRepository = this.tenantDatabase.getRepository(Task);
+    const task = taskRepository.create({
     title: createTaskDto.title,
     user: {
       id: userId,
     },
   });
 
-    return await this.taskRepository.save(task);
+    return await taskRepository.save(task);
   }
 
   async update(
@@ -103,7 +102,8 @@ export class TasksService {
 
     Object.assign(task, updateTaskDto);
 
-    return await this.taskRepository.save(task);
+    const taskRepository = this.tenantDatabase.getRepository(Task);
+    return await taskRepository.save(task);
   }
 
   async delete(
@@ -117,7 +117,8 @@ export class TasksService {
       scope,
     );
 
-    await this.taskRepository.remove(task);
+    const taskRepository = this.tenantDatabase.getRepository(Task);
+    await taskRepository.remove(task);
 
     return task;
   }
