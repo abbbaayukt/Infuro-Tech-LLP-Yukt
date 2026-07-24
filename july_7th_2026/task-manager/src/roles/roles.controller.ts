@@ -7,7 +7,10 @@ import { PermissionGuard } from '../permissions/guards/permission.guard';
 import { Permission } from '../permissions/decorators/permission.decorator';
 import { Resource } from '../permissions/enums/resource.enum';
 import { Action } from '../permissions/enums/action.enum';
+import { ApiExtraModels } from '@nestjs/swagger';
+import { PermissionDto } from './dto/permission.dto';
 
+@ApiExtraModels(PermissionDto)
 @UseGuards(JwtAuthGuard,PermissionGuard)
 @Controller('roles')
 export class RolesController {
